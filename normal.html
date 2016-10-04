@@ -14,7 +14,7 @@ line {
     stroke-width: 1px;
 }
 circle {
-    fill: violetred;
+    fill: #F6358A;
 }
     </style>
   </head>
@@ -24,7 +24,7 @@ circle {
 var min = 0,
     max = 80000,
     stddev = 12000,
-    bins = 10,
+    bins = 12,
     generator = (function() {
         var gen = d3.random.normal(max/2, stddev);
         return function() {
@@ -36,8 +36,8 @@ var data = d3.range(bins).map(function() { return [] });
 
 // chart
 var speed = 2500,
-    w = 300,
-    h = 300,
+    w = 400,
+    h = 400,
     bw = w/bins,
     r = 3,
     padding = 3;
