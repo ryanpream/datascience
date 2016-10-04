@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Histogram</title>
+     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.min.js"></script>
+    <style type="text/css">
+body {
+    margin: 3em;
+}
+
+line {
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+circle {
+    fill: steelblue;
+}
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+// data generator
+var min = 0,
+    max = 80000,
+    stddev = 12000,
+    bins = 18,
+    generator = (function() {
+        var gen = d3.random.normal(max/2, stddev);
+        return function() {
+            return ~~Math.max(min, Math.min(gen(), max));
+        }
+    }());
+    
+var data = d3.range(bins).map(function() { return [] });
+
+// chart
+var speed = 800,
+    w = 300,
+    h = 300,
+    bw = w/bins,
+    r = 3,
+    padding = 3;
+    
+var chart = d3.select('body').append('svg:svg')
+    .attr('width', w+4)
+    .attr('height', h+4)
+  .append('svg:g')
+    .attr('transform', 'translate(2,2)');
+    
+chart.append('svg:line')
+    .attr('x1', 0)
+    .attr('x2', w)
+    .attr('y1', h)
+    .attr('y2', h);
+    
+chart.selectAll('line.v')
+    .data(d3.range(bins+2))
+  .enter().append('svg:line')
+    .attr('class', 'v')
+    .attr('x1', function(d) { return d * bw })
+    .attr('x2', function(d) { return d * bw })
+    .attr('y1', 0)
+    .attr('y2', h);
+    
+var binCols = chart.selectAll('g.bin')
+    .data(data)
+  .enter().append('svg:g')
+    .attr('class', 'bin')
+    .attr('transform', function(d,i) { return 'translate(' + (i * bw) + ',0)' });
+    
+function redraw() {
+    var dots = binCols.selectAll('circle')
+        .data(function(d) { return d });
+        
+    dots.enter().append('svg:circle')
+        .attr('cx', bw/2)
+        .attr('cy', 0)
+        .attr('r', r);
+        
+    dots.transition()
+        .duration(speed)
+        .ease('bounce')
+        .attr('cy', function(d,i) {
+            return h - (i * (r*2 + padding) + padding*2) 
+        });
+}
+
+var target = 100,
+    counter = 0,
+    intervalId = setInterval(function() {
+        var number = generator();
+        // console.log(number);
+        bin = ~~(number / max * bins);
+        data[bin].push(number);
+        redraw();
+        if (++counter > target) {
+            clearInterval(intervalId);
+        }
+    }, speed);
+    
+    </script>
+  </body>
+</html>
